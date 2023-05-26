@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- layout:decorate：どのレイアウトにこのHTMLを組み込むかを指定する -->
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	layout:decorate="~{layout/layout}">
+<head>
+</head>
+<body>
+	<nav layout:fragment="header"
+		class="navbar navbar-expand-lg navbar-light bg-primary color fixed-top fs-4">
+		<div class="container-fluid">
+			<a class="navbar-brand fa fa-house" th:href="@{/user/list}"> Home</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item"><a class="nav-link" th:href="@{#}">Service</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" th:href="@{#}">Comapany</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" th:href="@{#}">Access</a>
+					</li>
+				</ul>
+				<ul class="navbar-nav align-items-center">
+      				<li class="nav-item align-middle text-white" 
+      					th:text="'こんにちは' + ${user.loginUserName} + 'さん'">
+      				</li>
+					<li class="nav-item">
+						<a class="nav-link"> 
+							<img th:src="${user.loginUserAccountIcon}" alt="アイコン画像" th:width="50px" th:height="50px">
+						</a>
+					</li>
+					<li class="nav-item">
+						<a th:href="@{/logout}" class="nav-link">Logout</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</body>
+</html>

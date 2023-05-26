@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<!-- Mapperとxmlのマッピング -->
+<mapper namespace="com.example.repository.UserMapper">
+
+<!-- マッピング定義(ユーザー) -->
+<resultMap type="com.example.model.MUser" id="muser">
+	<id column="user_id" property="userId"/>
+	<result column="phone_number" property="phoneNumber"/>
+	<result column="postal_number1" property="postalNumber1"/>
+	<result column="postal_number2" property="postalNumber2"/>
+	<result column="address" property="address"/>
+	<result column="user_name" property="userName"/>
+	<result column="password" property="password" />
+	<result column="birthday1" property="birthday1"/>
+	<result column="birthday2" property="birthday2"/>
+	<result column="age" property="age"/>
+	<result column="account_icon1" property="accountIcon1"/>
+	<result column="account_icon2" property="accountIcon2"/>
+	<result column="gender" property="gender"/>
+	<result column="department_id" property="departmentId" />
+	<result column="authority" property="authority" />
+	<association property="mdepartment" resultMap="department" />
+	<!-- パターン2では使わない↓ -->
+	<!--<collection property="purchaseList" resultMap="purchase" columnPrefix="purchase_" />  -->
+</resultMap>
+
+<!-- マッピング定義(店舗) -->
+<resultMap type="com.example.model.MDepartment" id="department">
+	<id column="department_id" property="departmentId" />
+	<result column="department_name" property="departmentName" />
+</resultMap>
+
+<!-- マッピング定義(商品) -->
+<resultMap type="com.example.model.MProduct" id="product">
+	<id column="product_id" property="productId" />
+	<result column="product_name" property="productName" />
+	<result column="product_price" property="productPrice" />
+	<collection property="purchaseList" resultMap="purchase" columnPrefix="product_" />
+</resultMap>
+
+<!-- マッピング定義(購入履歴) -->
+<resultMap type="com.example.model.TPurchase" id="purchase">
+	<id column="order_id" property="orderId"/>
+	<result column="user_id" property="userId" />
+	<result column="product_id" property="productId" />
+	<result column="count" property="count" />
+	<result column="purchase_date" property="purchaseDate" />
+	<association property="user" resultMap="muser" />
+	<association property="product" resultMap="product" />
+</resultMap>
+
+<!-- マッピング定義(商品在庫) -->
+<resultMap type="com.example.model.TStock" id="stock">
+	<id column="product_id" property="productId" />
+	<result column="product_stock" property="productStock" />
+</resultMap>
+	
+	<!-- ユーザー1件登録 -->
+	<insert id="insertOne">
+		<!-- テーブル(M_USER)の各項目 -->
+		insert into m_user(
+			user_id,
+			phone_number,
+			postal_number1,
+			postal_number2,
+			address,
+			user_name,
+			password,
+			birthday1,
+			birthday2,
+			age,
+			account_icon1,
+			account_icon2,
+			gender,
+			department_Id,
+			authority
+		)
+		<!-- エンティティクラスに定義した各項目 -->
+		values(
+			#{userId},
+			#{phoneNumber, jdbcType=VARCHAR},
+			#{postalNumber1, jdbcType=INTEGER},
+			#{postalNumber2, jdbcType=INTEGER},
+			#{address, jdbcType=VARCHAR},
+			#{userName},
+			#{password},
+			#{birthday1, jdbcType=DATE},
+			#{birthday2, jdbcType=DATE},
+			#{age, jdbcType=INTEGER},
+			#{accountIcon1, jdbcType=BLOB},
+			#{accountIcon2, jdbcType=VARCHAR},
+			#{gender, jdbcType=INTEGER},
+			#{departmentId, jdbcType=INTEGER},
+			#{authority, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- ユーザー情報全件取得(初期表示用) -->
+	<select id="findAllMUser" resultType="MUser">
+		SELECT * FROM M_USER 
+	</select>
+
+	<!-- 店舗の情報全件取得 -->
+	<select id="findAllMDepartment" resultType="MDepartment">
+		SELECT * FROM M_DEPARTMENT
+	</select>
+
+	<!-- ユーザー情報取得(検索処理用) -->
+	<select id="searchMUser" resultType="MUser">
+		SELECT * FROM M_USER
+		<where>
+			<if test="userId != null and userId != ''">
+				user_id like '%' || #{userId} || '%'
+			</if>
+			<if test="phoneNumber != null and phoneNumber != ''">
+				and phone_number = #{phoneNumber}
+			</if>
+			<if test="birthday2 != null">
+				and TO_CHAR(birthday2, 'yyyy-MM-dd') = TO_CHAR(#{birthday2}, 'yyyy-MM-dd')
+			</if>
+			<if test="userName != null and userName != ''">
+				and user_name like '%' || #{userName} || '%'
+			</if>
+			<if test="age != null">
+				and age = #{age}
+			</if>
+			<if test="gender != 2">
+				and gender = #{gender}
+			</if>
+		</where>
+	</select>
+
+	<!-- ユーザー情報1件取得 パターン1で使用 
+	<select id="findOneMUser" resultMap="muser">
+		SELECT  
+			M_USER.USER_ID,
+			M_USER.PHONE_NUMBER,
+			M_USER.POSTAL_NUMBER1,
+			M_USER.POSTAL_NUMBER2,
+			M_USER.ADDRESS,
+			M_USER.USER_NAME,
+			M_USER.PASSWORD,
+			M_USER.BIRTHDAY2,
+			M_USER.AGE,
+			M_USER.GENDER,
+			M_DEPARTMENT.DEPARTMENT_NAME,
+			T_PURCHASE.PRODUCT_ID AS PURCHASE_PRODUCT_ID,
+			T_PURCHASE.COUNT AS PURCHASE_COUNT,
+			T_PURCHASE.PURCHASE_DATE AS PURCHASE_PURCHASE_DATE
+		FROM M_USER
+			LEFT OUTER JOIN M_DEPARTMENT
+				ON M_USER.DEPARTMENT_ID = M_DEPARTMENT.DEPARTMENT_ID
+			LEFT OUTER JOIN T_PURCHASE
+				ON M_USER.USER_ID = T_PURCHASE.USER_ID
+		WHERE M_USER.USER_ID = #{userId}
+	</select> -->
+
+	<!-- ユーザー情報1件取得 パターン2で使用 -->	
+	<select id="findOneMUser" resultMap="muser">
+		SELECT  
+			M_USER.USER_ID,
+			M_USER.PHONE_NUMBER,
+			M_USER.POSTAL_NUMBER1,
+			M_USER.POSTAL_NUMBER2,
+			M_USER.ADDRESS,
+			M_USER.USER_NAME,
+			M_USER.PASSWORD,
+			M_USER.BIRTHDAY2,
+			M_USER.AGE,
+			M_USER.GENDER,
+			M_DEPARTMENT.DEPARTMENT_NAME
+		FROM M_USER
+			LEFT OUTER JOIN M_DEPARTMENT
+				ON M_USER.DEPARTMENT_ID = M_DEPARTMENT.DEPARTMENT_ID
+		WHERE M_USER.USER_ID = #{userId}
+	</select> 
+	
+	<!-- ユーザーの購入履歴を取得 パターン2で使用 --> 
+	<select id="findTPurchase" resultMap="purchase">
+		SELECT 
+			T_PURCHASE.COUNT,
+			T_PURCHASE.PURCHASE_DATE,
+			M_PRODUCT.PRODUCT_NAME,
+			M_PRODUCT.PRODUCT_PRICE
+		FROM T_PURCHASE
+			LEFT OUTER JOIN M_PRODUCT
+				ON T_PURCHASE.PRODUCT_ID = M_PRODUCT.PRODUCT_ID
+			LEFT OUTER JOIN M_USER
+				ON T_PURCHASE.USER_ID = M_USER.USER_ID
+		WHERE M_USER.USER_ID = #{userId}
+		ORDER BY T_PURCHASE.PURCHASE_DATE DESC
+	</select>
+	
+	<!-- ユーザー情報1件更新 -->
+	<update id="updateOneMUser">
+ 	UPDATE M_USER SET password = #{password}, user_name = #{userName} WHERE user_id = #{userId}  
+<!--UPDATE M_USER SET password = #{user.password}, user_name = #{user.userName} WHERE user_id = #{user.userId}-->
+	</update>
+	
+	<!-- ユーザー情報1件削除 -->
+	<delete id="deleteOneMUser">
+		DELETE FROM M_USER WHERE USER_ID = #{userId}
+	</delete>
+	
+	<!-- ログインユーザー情報取得 -->
+	<select id="findLoginUser" resultType="MUser">
+		SELECT * FROM M_USER WHERE USER_ID = #{userId}
+	</select>
+</mapper>

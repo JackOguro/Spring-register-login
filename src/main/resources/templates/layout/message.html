@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<!-- ログインメッセージ -->
+	<div th:fragment="message">
+		<div class="alert alert-danger" th:if="${param.error}">
+			<small th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"></small>
+		</div>
+		<div class="alert alert-success" th:if="${param.register}">
+			<small>ユーザーを新規登録しました</small>
+		</div>
+		<div class="alert alert-success" th:if="${param.logout}">
+			<small>ログアウトしました</small>
+		</div>
+	</div>
+
+	<!-- エラーメッセージ -->
+	<div th:fragment="error">
+		<div class="text-center">
+			<div class="display-1" th:text="${status}"></div>
+			<div class="text-muted mb-4" th:text="${error}"></div>
+			<div class="text-muted">ページを表示できません</div>
+			<a th:href="@{/}">&larr; ホームに戻る</a>
+		</div>
+	</div>
+</body>
+</html>
+
+<!--  
+<p th:if="${session['SPRING_SECURITY_LAST_EXCEPTION']}!=null"
+th:text="${session['SPRING_SECURITY_LAST_EXCEPTION'].message}"
+class="text-danger">
+-->

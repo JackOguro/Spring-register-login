@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- CSS読込 -->
+<link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/css/login/login.css}">
+<!-- JS読込 -->
+<script th:src="@{/webjars/jquery/jquery.min.js}" defer></script>
+<script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}" defer></script>
+<title th:text="#{login}"></title>
+</head>
+<body class="bg-light bg-gradient">
+	<div class="text-center">
+		<form method="post" th:action="@{/login}" class="form-login">
+			<h1 th:text="#{login}"></h1>
+			<!-- ログインメッセージ -->
+			<!-- layout:replaceに変更すると正しく表示できない -->
+			<div th:replace="~{layout/message::message}"></div>
+			<!-- ユーザーID -->
+			<div class="form-group mb-3">
+				<label for="userId" class="visually-hidden">userId</label>
+				<input type="text" class="form-control" th:placeholder="#{userId}" name="userId">
+			</div>
+			<!-- パスワード -->
+			<div class="form-group mb-3">
+				<label for="password" class="visually-hidden">password</label>
+				<input type="text" class="form-control" th:placeholder="#{password}" name="password">
+			</div>
+			<!-- ログインしたままにするかチェック -->
+			<div class="form-group form-check mb-3">
+				<label for="remember-me" class="form-check-label">ログインしたままにする</label>
+				<input class="form-check-input" type="checkbox" id="remember-me" name="remember-me">
+			</div>
+			<input type="submit" th:value="#{login}" class="btn btn-primary">
+		</form>
+		<a th:href="@{/user/signup}" th:text="#{toSignup}"></a>
+	</div>
+</body>
+</html>

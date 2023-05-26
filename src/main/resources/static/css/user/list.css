@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+.form-group {
+	margin-right:1%;
+}
+
+.search-label {
+	width:100px;
+	position:relative;
+}

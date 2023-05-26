@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout/layout}">
+<head>
+<title>ユーザー詳細</title>
+<!-- CSS読込 -->
+<link rel="stylesheet" th:href="@{/css/user/list.css}">
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="header border-bottom">
+			<h1 class="h2">ユーザー詳細</h1>
+		</div>
+		<form id="user-detail-form" method="post" th:action="@{/user/detail}" class="form-signup" th:object="${userDetailForm}">
+			<input type="hidden" th:field="*{userId}">
+			<!-- ユーザー詳細情報 -->
+			<table class="table table-striped table-bordered table-hover">
+				<tbody>
+					<tr>
+						<th class="w-25">ユーザーID</th>
+						<td th:text="*{userId}"></td>
+					</tr>
+					<tr>
+						<th>電話番号</th>
+						<td th:text="*{phoneNumber} == null ? '登録されていません' : *{phoneNumber}"></td>
+					</tr>
+					<tr>
+						<th>郵便番号</th>
+						<td th:text="*{postalNumber1} == null ? '登録されていません' : |*{postalNumber1} - *{postalNumber2}|"></td>
+					</tr>
+					<tr> 
+						<th>パスワード</th>
+						<td>
+							<input type="text" class="form-control" th:field="*{password}"/>
+						</td>
+					</tr> 
+					<tr>
+						<th>ユーザー名</th> 
+						<td>
+							<input type="text" class="form-control" th:field="*{userName}"/> 
+						</td>
+					</tr>
+					<tr>
+						<th>誕生日</th> 
+						<td th:text="*{birthday2} == null ? '登録されていません' : *{#dates.format(birthday2, 'YYYY/MM/dd')}"></td> 
+					</tr>
+					<tr> 
+						<th>年齢</th>
+						<td th:text="*{age} == null ? '登録されていません' : *{age}"></td>
+					</tr>
+					<tr>
+						<th>性別</th> 
+						<div th:switch="*{gender}">
+							<td th:case= 0 th:text='男性'>
+							<td th:case= 1 th:text='女性'>
+							<td th:case= "*" th:text='登録されていません'>
+						</div>
+					</tr>
+					<tr>
+						<th>店舗名</th>
+						<td th:text="*{mdepartment} == null ? '登録されていません' : *{mdepartment.departmentName}">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<!-- ボタンエリア -->
+			<div class="text-center">
+				<!-- 更新ボタン -->
+				<button class="btn btn-danger" type="submit" name="update">更新</button>
+				<!-- 削除ボタン -->
+				<button class="btn btn-primary" type="submit" name="delete">削除</button>
+			</div>
+			<!-- 購入情報 -->  
+			<th:block th:if="*{purchaseList != null and purchaseList.size() > 0}">
+				<div class="header border-bottom">
+					<h1 class="h2">購入履歴</h1>
+				</div>
+				<table class="table table-striped table-bordered table-hover">
+				<!-- パターン2
+					<thead>
+						<tr>
+							<th class="w-25">購入商品</th>
+							<th>購入数</th>
+							<th>購入日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : *{purchaseList}">
+						<div th:switch="${item.productId}">
+							<td th:case= 1 th:text="シャツ"></td>
+							<td th:case= 2 th:text="スカート"></td>
+							<td th:case= 3 th:text="ジャケット"></td>
+							<td th:case= 4 th:text="ズボン"></td>
+							<td th:case= 5 th:text="ワンピーズ"></td>
+						</div>
+							
+							<td th:text="${item.count}"></td>
+							<td th:text="${#dates.format(item.purchaseDate, 'YYYY/MM/dd')}"></td>
+						</tr>
+					</tbody>
+				-->
+					<thead>
+						<tr>
+							<th class="w-25">購入商品</th>
+							<th>購入数</th>
+							<th>購入金額</th>
+							<th>購入日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : *{purchaseList}">
+							<td th:text="${item.product.productName}"></td>
+							<td th:text="${item.count}"></td>
+							<td th:text="${item.product.productPrice * item.count}"></td>
+							<td th:text="${#dates.format(item.purchaseDate, 'YYYY/MM/dd')}"></td>
+						</tr>
+					</tbody>
+
+				</table>
+			</th:block>	
+		</form>
+<!--  	<img th:src="${base64AccountIcon}" alt="アイコン画像"  th:width="50px" th:height="50px"> -->
+	</div>
+</body>
+</html>
